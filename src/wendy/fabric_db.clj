@@ -270,7 +270,7 @@
                     :fabric/pattern :pattern/solid
                     :fabric/color :color/gray
                     :fabric/color-intensity :color-intensity/medium
-                    :fabric/weight :weight/mid-weight
+                    :fabric/weight :weight/lightweight
                     :fabric/length-yards 3.0
                     :fabric/width-inches 54
                     :fabric/country "unknown"
@@ -286,6 +286,7 @@
 (d/q '[:find ?e
        :where [?e :fabric/pattern :pattern/solid]]
       (d/db conn))
+;; => #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
 
 
 (def all-blue-plant-fabrics
@@ -296,6 +297,20 @@
 
 
 (d/q all-blue-plant-fabrics db)
+;; => #{[17592186045459] [17592186045464]}
+
+
+(def blue-plant-eids-set (d/q all-blue-plant-fabrics db))
+
+
+(type blue-plant-eids-set)
+;; => java.util.HashSet
+
+
+(map identity blue-plant-eids-set)
+;; => ([17592186045459] [17592186045464])
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 (def color-intensity-of-blue-plants 
@@ -306,15 +321,36 @@
     :where [?e :fabric/color :color/blue]
            [?e :fabric/fiber-origin :fiber-origin/plant]
            [?e :fabric/color-intensity ?color-intensity]])
+;; => #'wendy.fabric-db/color-intensity-of-blue-plants
 
 
 (d/q color-intensity-of-blue-plants db)
+;; => #{[17592186045464 17592186045450] [17592186045459 17592186045450]}
 
 
 (d/entity db 17592186045464)
+;; => #:db{:id 17592186045464}
+; this is an entity map
+
+(type (d/entity db 17592186045464))
+;; => datomic.query.EntityMap
 
 
 (d/pull db '[*] 17592186045464)
+;; => {:fabric/weight #:db{:id 17592186045455},
+;;     :fabric/type [#:db{:id 17592186045432}],
+;;     :fabric/pattern #:db{:id 17592186045437},
+;;     :fabric/color [#:db{:id 17592186045442}],
+;;     :fabric/length-yards 2.0,
+;;     :fabric/color-intensity #:db{:id 17592186045450},
+;;     :fabric/source "vintage",
+;;     :fabric/fiber-origin [#:db{:id 17592186045419}],
+;;     :fabric/fiber-content [#:db{:id 17592186045423}],
+;;     :fabric/structure #:db{:id 17592186045427},
+;;     :db/id 17592186045464,
+;;     :fabric/width-inches 45,
+;;     :fabric/country "unknown"}
 
 
 (d/touch (d/entity db 17592186045464))
+;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
