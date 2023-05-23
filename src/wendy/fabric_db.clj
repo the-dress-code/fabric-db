@@ -302,15 +302,14 @@
 
 (def blue-plant-eids-set (d/q all-blue-plant-fabrics db))
 
+; Do something to the eids
 
-(type blue-plant-eids-set)
-;; => java.util.HashSet
+(defn inc-set 
+  [coll]
+  (inc (first coll)))
 
-
-(map identity blue-plant-eids-set)
-;; => ([17592186045459] [17592186045464])
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(map inc-set blue-plant-eids-set)
+;; => (17592186045460 17592186045465)
 
 
 (def color-intensity-of-blue-plants 
@@ -330,10 +329,6 @@
 
 (d/entity db 17592186045464)
 ;; => #:db{:id 17592186045464}
-; this is an entity map
-
-(type (d/entity db 17592186045464))
-;; => datomic.query.EntityMap
 
 
 (d/pull db '[*] 17592186045464)
@@ -354,3 +349,4 @@
 
 (d/touch (d/entity db 17592186045464))
 ;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
+
