@@ -462,7 +462,20 @@ all-eid-values-light-blue-cotton
                 :fabric/type #{:type/dressweight}})
 ;; => (:weight/mid-weight #{:type/dressweight})
 
-; hey!
+; Use let:
+
+(defn get-some-vals-2
+  [map]
+  (let [intensity (:fabric/color-intensity map)
+        color (:fabric/color map)]
+    (list intensity color)))
+;; => #'wendy.fabric-db/get-some-vals-2
+
+(get-some-vals-2 {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+;; => (:color-intensity/light #{:color/blue})
+
+
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
