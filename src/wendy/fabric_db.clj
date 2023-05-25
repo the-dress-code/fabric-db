@@ -302,7 +302,8 @@
 
 (def blue-plant-eids-set (d/q all-blue-plant-fabrics db))
 
-; Do something to the eids
+
+; Do something to the eid that is inside the vector, inside the set.
 
 (defn inc-set 
   [coll]
@@ -310,6 +311,158 @@
 
 (map inc-set blue-plant-eids-set)
 ;; => (17592186045460 17592186045465)
+
+
+; Get just one value.
+
+(ffirst blue-plant-eids-set)
+;; => 17592186045459
+
+
+; Resolve one ATTRIBUTE/VALUE eid to its corresponding value.
+
+(d/touch (d/entity db 17592186045455))
+;; => #:db{:id 17592186045455, :ident :weight/mid-weight}
+
+(map val (d/touch (d/entity db 17592186045455)))
+;; => (:weight/mid-weight)
+
+(-> (first (map val (d/touch (d/entity db 17592186045455)))) name name)
+;; => "mid-weight"
+
+
+; another way: resolve one attrib eid to its cooresponding value.
+
+(d/ident db 17592186045455)
+;; => :weight/mid-weight
+
+(-> (d/ident db 17592186045455) name)
+;; => "mid-weight"
+
+
+; if given an eid for a fabric, can you build a name?
+
+; step 1 - get all the values of all the attributes
+
+(d/touch (d/entity db 17592186045464))
+;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
+
+; step 2 - make this a fn. "When you have functionality, capture it."
+
+(defn all-eid-values [eid]
+  (d/touch (d/entity db eid)))
+;; => #'wendy.fabric-db/all-eid-values
+
+(all-eid-values 17592186045464)
+;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
+
+(def all-eid-values-light-blue-cotton 
+  (all-eid-values 17592186045464))
+;; => #'wendy.fabric-db/all-eid-values-light-blue-cotton
+
+
+; step 3
+
+; what values do you want in your name?
+
+; in this order,
+
+; :fabric/color-intensity
+; :fabric/color
+; :fabric/weight.
+; :fabric/fiber-content
+; :fabric/structure
+
+; can you get those values out of your entity map?
+
+all-eid-values-light-blue-cotton
+;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
+
+(:fabric/weight all-eid-values-light-blue-cotton)
+;; => :weight/mid-weight
+
+(-> (:fabric/weight all-eid-values-light-blue-cotton) name)
+;; => "mid-weight"
+
+; write an fn that takes a entity map and key. returns one attrib value as a name.
+
+(-> (:fabric/weight all-eid-values-light-blue-cotton) name)
+
+(defn get-yr-val
+  [key map]
+  (key map))
+
+(get-yr-val :fabric/weight all-eid-values-light-blue-cotton)
+
+; write a function that takes an entity map, and uses your helper function to return something you need for your name.
+
+(defn to-the-edge
+  [entity-map]
+  (get-yr-val :fabric/weight entity-map))
+
+(to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+
+; next step: modify your function to return 2 yr-vals
+
+;  when you want to do some work and store function calls into vars that you want to use later… 
+;  use let below - bind the result of this to a var.
+
+(defn to-the-edge
+  [entity-map]
+  (let [x (get-yr-val :fabric/weight entity-map)]
+    x))
+
+(to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+
+; next step: modify your function to return 2 yr-vals
+
+;  when you want to do some work and store function calls into vars that you want to use later… 
+;  use let below - bind the result of this to a var.
+
+(defn to-the-edge
+  [entity-map]
+  (let [x (get-yr-val :fabric/color-intensity entity-map)
+        y (get-yr-val :fabric/color entity-map)]
+    x y))
+
+(to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+
+
+
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+; ideas for later:
+
+; (map val hashmap) will map val over your entity map and return the value of all entity attributes.
+
+(map val {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+;; => (:weight/mid-weight
+;;     #{:type/dressweight}
+;;     :pattern/solid
+;;     #{:color/blue}
+;;     2.0
+;;     :color-intensity/light
+;;     "vintage"
+;;     #{:fiber-origin/plant}
+;;     #{:fiber-content/cotton}
+;;     :structure/woven
+;;     17592186045464
+;;     45
+;;     "unknown")
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 
 (def color-intensity-of-blue-plants 
