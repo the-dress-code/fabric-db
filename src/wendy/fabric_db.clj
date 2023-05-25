@@ -363,7 +363,7 @@
 
 ; :fabric/color-intensity
 ; :fabric/color
-; :fabric/weight.
+; :fabric/weight
 ; :fabric/fiber-content
 ; :fabric/structure
 
@@ -419,7 +419,7 @@ all-eid-values-light-blue-cotton
 (to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
 ;; => :weight/mid-weight
 
-; next step: modify your function to return 2 yr-vals
+;  next step: modify your function to return 2 yr-vals
 
 ;  when you want to do some work and store function calls into vars that you want to use later… 
 ;  use let below - bind the result of this to a var.
@@ -474,13 +474,18 @@ all-eid-values-light-blue-cotton
 (get-some-vals-2 {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
 ;; => (:color-intensity/light #{:color/blue})
 
+(name (first (get-some-vals-2 {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})))
+;; => "light"
+
+; how do you get the value out of #{:color/blue}?
+; did you do it before?
+
+
+
 
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
 
 ; ideas for later:
 
@@ -500,8 +505,6 @@ all-eid-values-light-blue-cotton
 ;;     17592186045464
 ;;     45
 ;;     "unknown")
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
