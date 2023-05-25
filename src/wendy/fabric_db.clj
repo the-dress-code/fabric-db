@@ -302,7 +302,6 @@
 
 (def blue-plant-eids-set (d/q all-blue-plant-fabrics db))
 
-
 ; Do something to the eid that is inside the vector, inside the set.
 
 (defn inc-set 
@@ -312,12 +311,10 @@
 (map inc-set blue-plant-eids-set)
 ;; => (17592186045460 17592186045465)
 
-
 ; Get just one value.
 
 (ffirst blue-plant-eids-set)
 ;; => 17592186045459
-
 
 ; Resolve one ATTRIBUTE/VALUE eid to its corresponding value.
 
@@ -330,7 +327,6 @@
 (-> (first (map val (d/touch (d/entity db 17592186045455)))) name name)
 ;; => "mid-weight"
 
-
 ; another way: resolve one attrib eid to its cooresponding value.
 
 (d/ident db 17592186045455)
@@ -338,7 +334,6 @@
 
 (-> (d/ident db 17592186045455) name)
 ;; => "mid-weight"
-
 
 ; if given an eid for a fabric, can you build a name?
 
@@ -359,7 +354,6 @@
 (def all-eid-values-light-blue-cotton 
   (all-eid-values 17592186045464))
 ;; => #'wendy.fabric-db/all-eid-values-light-blue-cotton
-
 
 ; step 3
 
@@ -387,20 +381,29 @@ all-eid-values-light-blue-cotton
 ; write an fn that takes a entity map and key. returns one attrib value as a name.
 
 (-> (:fabric/weight all-eid-values-light-blue-cotton) name)
+;; => "mid-weight"
+
+; Remove the namespace later, not now, bc some values can't be resolved to names without further processing.
+
+; FYI future me took out name-resolving fn of this helper fn.
 
 (defn get-yr-val
   [key map]
   (key map))
+;; => #'wendy.fabric-db/get-yr-val
 
 (get-yr-val :fabric/weight all-eid-values-light-blue-cotton)
+;; => :weight/mid-weight
 
 ; write a function that takes an entity map, and uses your helper function to return something you need for your name.
 
 (defn to-the-edge
-  [entity-map]
-  (get-yr-val :fabric/weight entity-map))
+  [map]
+  (get-yr-val :fabric/weight map))
+;; => #'wendy.fabric-db/to-the-edge
 
 (to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+;; => :weight/mid-weight
 
 ; next step: modify your function to return 2 yr-vals
 
@@ -411,8 +414,10 @@ all-eid-values-light-blue-cotton
   [entity-map]
   (let [x (get-yr-val :fabric/weight entity-map)]
     x))
+;; => #'wendy.fabric-db/to-the-edge
 
 (to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+;; => :weight/mid-weight
 
 ; next step: modify your function to return 2 yr-vals
 
@@ -424,16 +429,40 @@ all-eid-values-light-blue-cotton
   (let [x (get-yr-val :fabric/color-intensity entity-map)
         y (get-yr-val :fabric/color entity-map)]
     x y))
+;; => #'wendy.fabric-db/to-the-edge
 
 (to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
+;; => #{:color/blue}
 
+; hmm, this is only 1 val, not 2 val. how to fix?
 
+; My helper fn get-yr-val seems to do the same as to-the-edge now since i took out the name-resolve, so i think get-yr-val redundant. i'll consolidate get-yr-val and to-the-edge and now write "get-the-val".
 
+(defn get-the-val
+  [key map]
+  (key map))
+;; => #'wendy.fabric-db/get-the-val
 
+(get-the-val :fabric/color-intensity all-eid-values-light-blue-cotton)
+;; => :color-intensity/light
 
+; next step: modify your function to return 2 yr-vals
+;  when you want to do some work and store function calls into vars that you want to use later… use let.
+;  use let below - bind the result of this to a var.
 
+; what if i destructure like this....
 
+(defn get-some-vals 
+  [{a :fabric/weight 
+    b :fabric/type}]
+  (list a b))
+;; => #'wendy.fabric-db/get-some-vals
 
+(get-some-vals {:fabric/weight :weight/mid-weight
+                :fabric/type #{:type/dressweight}})
+;; => (:weight/mid-weight #{:type/dressweight})
+
+; hey!
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -502,4 +531,3 @@ all-eid-values-light-blue-cotton
 
 (d/touch (d/entity db 17592186045464))
 ;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
-
