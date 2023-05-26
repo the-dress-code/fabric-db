@@ -324,10 +324,10 @@
 (map val (d/touch (d/entity db 17592186045455)))
 ;; => (:weight/mid-weight)
 
-(-> (first (map val (d/touch (d/entity db 17592186045455)))) name name)
+(-> (first (map val (d/touch (d/entity db 17592186045455)))) name)
 ;; => "mid-weight"
 
-; another way: resolve one attrib eid to its cooresponding value.
+; another way: if you have the  attrib eid, use ident to return cooresponding value.
 
 (d/ident db 17592186045455)
 ;; => :weight/mid-weight
@@ -462,6 +462,8 @@ all-eid-values-light-blue-cotton
                 :fabric/type #{:type/dressweight}})
 ;; => (:weight/mid-weight #{:type/dressweight})
 
+
+
 ; Use let:
 
 (defn get-some-vals-2
@@ -477,9 +479,98 @@ all-eid-values-light-blue-cotton
 (name (first (get-some-vals-2 {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})))
 ;; => "light"
 
-; how do you get the value out of #{:color/blue}?
-; did you do it before?
+(defn get-five-vals
+  [map]
+  (let [intensity (:fabric/color-intensity map)
+        color (:fabric/color map)
+        weight (:fabric/weight map)
+        content (:fabric/fiber-content map)
+        structure (:fabric/structure map)]
+    (list intensity color weight content structure)))
 
+(get-five-vals all-eid-values-light-blue-cotton)
+;; => (:color-intensity/light
+;;     #{:color/blue}
+;;     :weight/mid-weight
+;;     #{:fiber-content/cotton}
+;;     :structure/woven)
+
+; Get value out of the set. Get name from the value. 
+
+(-> #{:color/blue}
+    (first)
+    (name))
+;; => "blue"
+
+; so we'll need to test to see if the ns-value is a coll or not.
+; if ns-val is a coll, get the value out, get the name from the value.
+
+; you get a map
+
+; {:fabric/weight :weight/mid-weight, 
+; :fabric/type #{:type/dressweight}, 
+; :fabric/pattern :pattern/solid, 
+; :fabric/color #{:color/blue}, 
+; :fabric/length-yards 2.0, :
+; fabric/color-intensity :color-intensity/light, 
+; :fabric/source "vintage", 
+; :fabric/fiber-origin #{:fiber-origin/plant}, 
+; :fabric/fiber-content #{:fiber-content/cotton}, 
+; :fabric/structure :structure/woven, 
+; :db/id 17592186045464, 
+; :fabric/width-inches 45, 
+; :fabric/country "unknown"}
+
+; then we get a list of ns-vals
+
+; (:color-intensity/light
+; #{:color/blue}
+; :weight/mid-weight
+; #{:fiber-content/cotton}
+; :structure/woven)
+
+; now check for colls in your coll. map?
+
+(def sample '(:structure/woven #{:color/blue} :weight/mid-weight #{:fiber-content/cotton :fiber-content/polyester}))
+
+(def sample2 '(:color-intensity/light #{:color/blue}))
+
+(map coll? sample)
+;; => (false true false true)
+
+(map coll? sample2)
+;; => (false true)
+
+(defn is-set? [coll]
+  (if (set? coll)
+    (map val coll)
+    coll))
+;; => #'wendy.fabric-db/is-set?
+
+(is-set? '(:color-intensity/light #{:color/blue}))
+;; => (:color-intensity/light #{:color/blue})
+; is-set? is receiving a list so its giving back the list.
+
+; nope
+(is-set? #{:color/blue})
+;; => Error printing return value (ClassCastException) at null (REPL:1).
+;;    null
+
+; nope
+(map is-set? sample)
+;; => (:structure/wovenError printing return value (ClassCastException) at null (REPL:1).
+;;    null
+
+; nope
+(map val #{:fiber-content/cotton :fiber-content/polyester})
+;; => Error printing return value (ClassCastException) at null (REPL:1).
+;;    null
+
+
+
+; now resolve all to names
+
+; now resolve (join?) all to one string. 
 
 
 
@@ -505,6 +596,16 @@ all-eid-values-light-blue-cotton
 ;;     17592186045464
 ;;     45
 ;;     "unknown")
+
+; how to resolve as string? this aint it.
+
+(require '[clojure.string :as string])
+
+(string/join "" '("i" "want" "candy"))
+;; => "iwantcandy"
+
+(clojure.string/join "" '("i" "want" "candy"))
+;; => "iwantcandy"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -547,3 +648,5 @@ all-eid-values-light-blue-cotton
 
 (d/touch (d/entity db 17592186045464))
 ;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
+
+; solid eids  #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
