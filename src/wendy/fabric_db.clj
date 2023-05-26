@@ -122,6 +122,7 @@
                      :db/valueType :db.type/string
                      :db/cardinality :db.cardinality/one
                      :db/doc "The vendor who sold the fabric"}])
+;; => #'wendy.fabric-db/fabric-schema
 
 
 @(d/transact conn fabric-schema)
@@ -270,38 +271,6 @@
 @(d/transact conn initial-fabrics)
 
 (def db (d/db conn))
-
-
-;;;;;;;;;;;;;; EXAMPLES
-
-(d/q '[:find ?e
-       :where [?e :fabric/pattern :pattern/solid]]
-      (d/db conn))
-
-(def all-blue-plant-fabrics
-  "A query to return all the blue and plant fabric entity ids"
-  '[:find ?e
-    :where [?e :fabric/color :color/blue]
-           [?e :fabric/fiber-origin :fiber-origin/plant]])
-
-(d/q all-blue-plant-fabrics db)
-
-(def blue-plant-eids (d/q all-blue-plant-fabrics db))
-
-(def color-intensity-of-blue-plant-fabric 
-  "A query to return all blue & plant fabric entity ids and the color intensity eids"
-  '[:find ?e ?color-intensity
-    :where [?e :fabric/color :color/blue]
-           [?e :fabric/fiber-origin :fiber-origin/plant]
-           [?e :fabric/color-intensity ?color-intensity]])
-
-(d/q color-intensity-of-blue-plant-fabric db)
-
-(d/entity db 17592186045464)
-
-(d/pull db '[*] 17592186045464)
-
-(d/touch (d/entity db 17592186045464))
 
 
 ;;;;;;;;;;;;;; BUILD A NAME FROM AN ENTITY ID.
