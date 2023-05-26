@@ -1,21 +1,15 @@
 (ns wendy.fabric-db
   (:gen-class))
 
-
 (require '[datomic.api :as d])
-
 
 (def db-uri "datomic:mem://fabric")
 
-
 (d/create-database db-uri)
-
 
 (def conn (d/connect db-uri))
 
-
 @(d/transact conn [{:db/doc "Hiya, world! This is my fabric database."}])
-
 
 (def fabric-schema [#_{:db/ident :fabric/name 
                      :db/valueType :db.type/string
@@ -63,10 +57,7 @@
                     {:db/ident :type/jersey}
                     {:db/ident :type/flannel}
                     {:db/ident :type/activewear}
-
-                    ;; possible additional types: challis, satin, denim, twill, chiffon, suiting, gabardine, 
-                    ;; swimwear, lace, lining, interlock, home-dec, sweater-knit
-
+          
                     {:db/ident :fabric/pattern
                      :db/valueType :db.type/ref
                      :db/cardinality :db.cardinality/one
@@ -191,7 +182,6 @@
                     :fabric/country "Eastern Europe"
                     :fabric/source "fabrics-store.com"}
 
-
                    {#_#_:fabric/name "black multi floral rayon challis"
                     :fabric/fiber-origin :fiber-origin/manufactured
                     :fabric/fiber-content :fiber-content/rayon
@@ -279,15 +269,14 @@
 
 @(d/transact conn initial-fabrics)
 
-
 (def db (d/db conn))
 
+
+;;;;;;;;;;;;;; EXAMPLES
 
 (d/q '[:find ?e
        :where [?e :fabric/pattern :pattern/solid]]
       (d/db conn))
-;; => #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
-
 
 (def all-blue-plant-fabrics
   "A query to return all the blue and plant fabric entity ids"
@@ -295,189 +284,39 @@
     :where [?e :fabric/color :color/blue]
            [?e :fabric/fiber-origin :fiber-origin/plant]])
 
-
 (d/q all-blue-plant-fabrics db)
-;; => #{[17592186045459] [17592186045464]}
 
+(def blue-plant-eids (d/q all-blue-plant-fabrics db))
 
-(def blue-plant-eids-set (d/q all-blue-plant-fabrics db))
+(def color-intensity-of-blue-plant-fabric 
+  "A query to return all blue & plant fabric entity ids and the color intensity eids"
+  '[:find ?e ?color-intensity
+    :where [?e :fabric/color :color/blue]
+           [?e :fabric/fiber-origin :fiber-origin/plant]
+           [?e :fabric/color-intensity ?color-intensity]])
 
-; Do something to the eid that is inside the vector, inside the set.
+(d/q color-intensity-of-blue-plant-fabric db)
 
-(defn inc-set 
-  [coll]
-  (inc (first coll)))
+(d/entity db 17592186045464)
 
-(map inc-set blue-plant-eids-set)
-;; => (17592186045460 17592186045465)
-
-; Get just one value.
-
-(ffirst blue-plant-eids-set)
-;; => 17592186045459
-
-; Resolve one ATTRIBUTE/VALUE eid to its corresponding value.
-
-(d/touch (d/entity db 17592186045455))
-;; => #:db{:id 17592186045455, :ident :weight/mid-weight}
-
-(map val (d/touch (d/entity db 17592186045455)))
-;; => (:weight/mid-weight)
-
-(-> (first (map val (d/touch (d/entity db 17592186045455)))) name)
-;; => "mid-weight"
-
-; another way: if you have the  attrib eid, use ident to return cooresponding value.
-
-(d/ident db 17592186045455)
-;; => :weight/mid-weight
-
-(-> (d/ident db 17592186045455) name)
-;; => "mid-weight"
-
-; if given an eid for a fabric, can you build a name?
-
-; step 1 - get all the values of all the attributes
+(d/pull db '[*] 17592186045464)
 
 (d/touch (d/entity db 17592186045464))
-;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
 
-; step 2 - make this a fn. "When you have functionality, capture it."
 
-(defn all-eid-values [eid]
+;;;;;;;;;;;;;; BUILD A NAME FROM AN ENTITY ID.
+
+; Step 1 - get all the attribute values of one fabric's entity id
+
+(defn all-attrib-values [eid]
   (d/touch (d/entity db eid)))
-;; => #'wendy.fabric-db/all-eid-values
 
-(all-eid-values 17592186045464)
-;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
+(all-attrib-values 17592186045464)
 
-(def all-eid-values-light-blue-cotton 
-  (all-eid-values 17592186045464))
-;; => #'wendy.fabric-db/all-eid-values-light-blue-cotton
+(def all-attrib-values-light-blue-cotton 
+  (all-attrib-values 17592186045464))
 
-; step 3
-
-; what values do you want in your name?
-
-; in this order,
-
-; :fabric/color-intensity
-; :fabric/color
-; :fabric/weight
-; :fabric/fiber-content
-; :fabric/structure
-
-; can you get those values out of your entity map?
-
-all-eid-values-light-blue-cotton
-;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
-
-(:fabric/weight all-eid-values-light-blue-cotton)
-;; => :weight/mid-weight
-
-(-> (:fabric/weight all-eid-values-light-blue-cotton) name)
-;; => "mid-weight"
-
-; write an fn that takes a entity map and key. returns one attrib value as a name.
-
-(-> (:fabric/weight all-eid-values-light-blue-cotton) name)
-;; => "mid-weight"
-
-; Remove the namespace later, not now, bc some values can't be resolved to names without further processing.
-
-; FYI future me took out name-resolving fn of this helper fn.
-
-(defn get-yr-val
-  [key map]
-  (key map))
-;; => #'wendy.fabric-db/get-yr-val
-
-(get-yr-val :fabric/weight all-eid-values-light-blue-cotton)
-;; => :weight/mid-weight
-
-; write a function that takes an entity map, and uses your helper function to return something you need for your name.
-
-(defn to-the-edge
-  [map]
-  (get-yr-val :fabric/weight map))
-;; => #'wendy.fabric-db/to-the-edge
-
-(to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
-;; => :weight/mid-weight
-
-; next step: modify your function to return 2 yr-vals
-
-;  when you want to do some work and store function calls into vars that you want to use later… 
-;  use let below - bind the result of this to a var.
-
-(defn to-the-edge
-  [entity-map]
-  (let [x (get-yr-val :fabric/weight entity-map)]
-    x))
-;; => #'wendy.fabric-db/to-the-edge
-
-(to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
-;; => :weight/mid-weight
-
-;  next step: modify your function to return 2 yr-vals
-
-;  when you want to do some work and store function calls into vars that you want to use later… 
-;  use let below - bind the result of this to a var.
-
-(defn to-the-edge
-  [entity-map]
-  (let [x (get-yr-val :fabric/color-intensity entity-map)
-        y (get-yr-val :fabric/color entity-map)]
-    x y))
-;; => #'wendy.fabric-db/to-the-edge
-
-(to-the-edge {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
-;; => #{:color/blue}
-
-; hmm, this is only 1 val, not 2 val. how to fix?
-
-; My helper fn get-yr-val seems to do the same as to-the-edge now since i took out the name-resolve, so i think get-yr-val redundant. i'll consolidate get-yr-val and to-the-edge and now write "get-the-val".
-
-(defn get-the-val
-  [key map]
-  (key map))
-;; => #'wendy.fabric-db/get-the-val
-
-(get-the-val :fabric/color-intensity all-eid-values-light-blue-cotton)
-;; => :color-intensity/light
-
-; next step: modify your function to return 2 yr-vals
-;  when you want to do some work and store function calls into vars that you want to use later… use let.
-;  use let below - bind the result of this to a var.
-
-; what if i destructure like this....
-
-(defn get-some-vals 
-  [{a :fabric/weight 
-    b :fabric/type}]
-  (list a b))
-;; => #'wendy.fabric-db/get-some-vals
-
-(get-some-vals {:fabric/weight :weight/mid-weight
-                :fabric/type #{:type/dressweight}})
-;; => (:weight/mid-weight #{:type/dressweight})
-
-
-
-; Use let:
-
-(defn get-some-vals-2
-  [map]
-  (let [intensity (:fabric/color-intensity map)
-        color (:fabric/color map)]
-    (list intensity color)))
-;; => #'wendy.fabric-db/get-some-vals-2
-
-(get-some-vals-2 {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
-;; => (:color-intensity/light #{:color/blue})
-
-(name (first (get-some-vals-2 {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})))
-;; => "light"
+; Step 2 - get the 5 attribute values of one fabric's entity id.
 
 (defn get-five-vals
   [map]
@@ -488,165 +327,4 @@ all-eid-values-light-blue-cotton
         structure (:fabric/structure map)]
     (list intensity color weight content structure)))
 
-(get-five-vals all-eid-values-light-blue-cotton)
-;; => (:color-intensity/light
-;;     #{:color/blue}
-;;     :weight/mid-weight
-;;     #{:fiber-content/cotton}
-;;     :structure/woven)
-
-; Get value out of the set. Get name from the value. 
-
-(-> #{:color/blue}
-    (first)
-    (name))
-;; => "blue"
-
-; so we'll need to test to see if the ns-value is a coll or not.
-; if ns-val is a coll, get the value out, get the name from the value.
-
-; you get a map
-
-; {:fabric/weight :weight/mid-weight, 
-; :fabric/type #{:type/dressweight}, 
-; :fabric/pattern :pattern/solid, 
-; :fabric/color #{:color/blue}, 
-; :fabric/length-yards 2.0, :
-; fabric/color-intensity :color-intensity/light, 
-; :fabric/source "vintage", 
-; :fabric/fiber-origin #{:fiber-origin/plant}, 
-; :fabric/fiber-content #{:fiber-content/cotton}, 
-; :fabric/structure :structure/woven, 
-; :db/id 17592186045464, 
-; :fabric/width-inches 45, 
-; :fabric/country "unknown"}
-
-; then we get a list of ns-vals
-
-; (:color-intensity/light
-; #{:color/blue}
-; :weight/mid-weight
-; #{:fiber-content/cotton}
-; :structure/woven)
-
-; now check for colls in your coll. map?
-
-(def sample '(:structure/woven #{:color/blue} :weight/mid-weight #{:fiber-content/cotton :fiber-content/polyester}))
-
-(def sample2 '(:color-intensity/light #{:color/blue}))
-
-(map coll? sample)
-;; => (false true false true)
-
-(map coll? sample2)
-;; => (false true)
-
-(defn is-set? [coll]
-  (if (set? coll)
-    (map val coll)
-    coll))
-;; => #'wendy.fabric-db/is-set?
-
-(is-set? '(:color-intensity/light #{:color/blue}))
-;; => (:color-intensity/light #{:color/blue})
-; is-set? is receiving a list so its giving back the list.
-
-; nope
-(is-set? #{:color/blue})
-;; => Error printing return value (ClassCastException) at null (REPL:1).
-;;    null
-
-; nope
-(map is-set? sample)
-;; => (:structure/wovenError printing return value (ClassCastException) at null (REPL:1).
-;;    null
-
-; nope
-(map val #{:fiber-content/cotton :fiber-content/polyester})
-;; => Error printing return value (ClassCastException) at null (REPL:1).
-;;    null
-
-
-
-; now resolve all to names
-
-; now resolve (join?) all to one string. 
-
-
-
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-; ideas for later:
-
-; (map val hashmap) will map val over your entity map and return the value of all entity attributes.
-
-(map val {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"})
-;; => (:weight/mid-weight
-;;     #{:type/dressweight}
-;;     :pattern/solid
-;;     #{:color/blue}
-;;     2.0
-;;     :color-intensity/light
-;;     "vintage"
-;;     #{:fiber-origin/plant}
-;;     #{:fiber-content/cotton}
-;;     :structure/woven
-;;     17592186045464
-;;     45
-;;     "unknown")
-
-; how to resolve as string? this aint it.
-
-(require '[clojure.string :as string])
-
-(string/join "" '("i" "want" "candy"))
-;; => "iwantcandy"
-
-(clojure.string/join "" '("i" "want" "candy"))
-;; => "iwantcandy"
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
-(def color-intensity-of-blue-plants 
-  "A query to return all the blue and plant fabric entity ids and the ids for 1 attribute's entity id (color intensity)"
-
-
-  '[:find ?e ?color-intensity
-    :where [?e :fabric/color :color/blue]
-           [?e :fabric/fiber-origin :fiber-origin/plant]
-           [?e :fabric/color-intensity ?color-intensity]])
-;; => #'wendy.fabric-db/color-intensity-of-blue-plants
-
-
-(d/q color-intensity-of-blue-plants db)
-;; => #{[17592186045464 17592186045450] [17592186045459 17592186045450]}
-
-
-(d/entity db 17592186045464)
-;; => #:db{:id 17592186045464}
-
-
-(d/pull db '[*] 17592186045464)
-;; => {:fabric/weight #:db{:id 17592186045455},
-;;     :fabric/type [#:db{:id 17592186045432}],
-;;     :fabric/pattern #:db{:id 17592186045437},
-;;     :fabric/color [#:db{:id 17592186045442}],
-;;     :fabric/length-yards 2.0,
-;;     :fabric/color-intensity #:db{:id 17592186045450},
-;;     :fabric/source "vintage",
-;;     :fabric/fiber-origin [#:db{:id 17592186045419}],
-;;     :fabric/fiber-content [#:db{:id 17592186045423}],
-;;     :fabric/structure #:db{:id 17592186045427},
-;;     :db/id 17592186045464,
-;;     :fabric/width-inches 45,
-;;     :fabric/country "unknown"}
-
-
-(d/touch (d/entity db 17592186045464))
-;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
-
-; solid eids  #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
+(get-five-vals all-attrib-values-light-blue-cotton)
