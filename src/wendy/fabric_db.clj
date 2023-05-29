@@ -285,7 +285,7 @@
 (def all-attrib-values-light-blue-cotton 
   (all-attrib-values 17592186045464))
 
-; Step 2 - get the 5 attribute values of one fabric's entity id.
+; Step 2 - get the 5 attribute values of one fabric's entity map.
 
 (defn get-five-vals
   [map]
@@ -297,3 +297,4 @@
     (list intensity color weight content structure)))
 
 (get-five-vals all-attrib-values-light-blue-cotton)
+

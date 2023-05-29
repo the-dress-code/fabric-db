@@ -4,8 +4,6 @@
 (d/q '[:find ?e
        :where [?e :fabric/pattern :pattern/solid]]
       (d/db conn))
-;; => Syntax error compiling at (src/wendy/examples.clj:4:1).
-;;    No such namespace: d
 
 (def all-blue-plant-fabrics
   "A query to return all the blue and plant fabric entity ids"

@@ -567,10 +567,38 @@ all-eid-values-light-blue-cotton
 ;;    null
 
 
+; now resolve all to names of values
 
-; now resolve all to names
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 ; now resolve (join?) all to one string. 
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
