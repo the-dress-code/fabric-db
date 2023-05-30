@@ -502,99 +502,38 @@ all-eid-values-light-blue-cotton
     (name))
 ;; => "blue"
 
-; so we'll need to test to see if the ns-value is a coll or not.
-; if ns-val is a coll, get the value out, get the name from the value.
+; so we'll need to test to see if the ns-value is a set or not.
 
-; you get a map
+; map a fn over each item. what fn?
+; set?
 
-; {:fabric/weight :weight/mid-weight, 
-; :fabric/type #{:type/dressweight}, 
-; :fabric/pattern :pattern/solid, 
-; :fabric/color #{:color/blue}, 
-; :fabric/length-yards 2.0, :
-; fabric/color-intensity :color-intensity/light, 
-; :fabric/source "vintage", 
-; :fabric/fiber-origin #{:fiber-origin/plant}, 
-; :fabric/fiber-content #{:fiber-content/cotton}, 
-; :fabric/structure :structure/woven, 
-; :db/id 17592186045464, 
-; :fabric/width-inches 45, 
-; :fabric/country "unknown"}
+(map set? (get-five-vals all-attrib-values-light-blue-cotton))
+;; => (false true false true false)
 
-; then we get a list of ns-vals
-
-; (:color-intensity/light
-; #{:color/blue}
-; :weight/mid-weight
-; #{:fiber-content/cotton}
-; :structure/woven)
-
-; now check for colls in your coll. map?
-
-(def sample '(:structure/woven #{:color/blue} :weight/mid-weight #{:fiber-content/cotton :fiber-content/polyester}))
-
-(def sample2 '(:color-intensity/light #{:color/blue}))
-
-(map coll? sample)
-;; => (false true false true)
-
-(map coll? sample2)
-;; => (false true)
-
-(defn is-set? [coll]
-  (if (set? coll)
-    (map val coll)
-    coll))
-;; => #'wendy.fabric-db/is-set?
-
-(is-set? '(:color-intensity/light #{:color/blue}))
-;; => (:color-intensity/light #{:color/blue})
-; is-set? is receiving a list so its giving back the list.
-
-; nope
-(is-set? #{:color/blue})
-;; => Error printing return value (ClassCastException) at null (REPL:1).
-;;    null
-
-; nope
-(map is-set? sample)
-;; => (:structure/wovenError printing return value (ClassCastException) at null (REPL:1).
-;;    null
-
-; nope
-(map val #{:fiber-content/cotton :fiber-content/polyester})
-;; => Error printing return value (ClassCastException) at null (REPL:1).
-;;    null
-
-
+; if the item is a set, give me the item in the set.
+; if the item is not a set, give me the item.
 ; now resolve all to names of values
 
 
+; Step 3+ Test for sets, get items out if set, return item otherwise, then return all with names resolved.
+
+(defn gimme-names [x]
+  (if (set? x)
+    (-> x
+        (first)
+        (name))
+    (name x)))
 
 
+(map gimme-names (get-five-vals all-attrib-values-light-blue-cotton))
+;; => ("light" "blue" "mid-weight" "cotton" "woven")
+
+; Step 4 Resolve list of strings to one string with spaces between the words.
+
+(str "light" "blue" "mid-weight" "cotton" "woven")
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-; now resolve (join?) all to one string. 
-
-
-
-
-
-
-
-
+; HOW TO ADD WHITE SPACES?
 
 
 
@@ -634,6 +573,9 @@ all-eid-values-light-blue-cotton
 
 (clojure.string/join "" '("i" "want" "candy"))
 ;; => "iwantcandy"
+
+
+(str  ("light" "blue" "mid-weight" "cotton" "woven"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

@@ -297,4 +297,23 @@
     (list intensity color weight content structure)))
 
 (get-five-vals all-attrib-values-light-blue-cotton)
+;; => (:color-intensity/light
+;;     #{:color/blue}
+;;     :weight/mid-weight
+;;     #{:fiber-content/cotton}
+;;     :structure/woven)
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+; Step 3+ Test for sets, get items out if set, return item otherwise, then return all with names resolved.
+
+(defn gimme-names [x]
+  (if (set? x)
+    (-> x
+        (first)
+        (name))
+    (name x)))
+
+(map gimme-names (get-five-vals all-attrib-values-light-blue-cotton))
+
+; Step 4 Resolve list of strings to one string with spaces between the words.
