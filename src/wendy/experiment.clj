@@ -537,6 +537,59 @@ all-eid-values-light-blue-cotton
 
 ; YESSSSSSSSSSSSSSSSS BABYYYYYYYYYYYYYYYYY
 
+;;;;;;;;;;;;;; BUILD A NAME FROM AN ENTITY ID.
+
+; Step 1 - get all the attribute values of one fabric's entity id
+
+(defn all-attrib-values [eid]
+  (d/touch (d/entity db eid)))
+
+(all-attrib-values 17592186045464)
+
+(def all-attrib-values-light-blue-cotton 
+  (all-attrib-values 17592186045464))
+
+; Step 2 - get the 5 attribute values of one fabric's entity map.
+
+(defn get-five-vals
+  [map]
+  (let [intensity (:fabric/color-intensity map)
+        color (:fabric/color map)
+        weight (:fabric/weight map)
+        content (:fabric/fiber-content map)
+        structure (:fabric/structure map)]
+    (list intensity color weight content structure)))
+
+(get-five-vals all-attrib-values-light-blue-cotton)
+
+; Step 3+ Test for sets, get items out if set, return item otherwise, then return all with names resolved.
+
+(defn gimme-names [x]
+  (if (set? x)
+    (-> x
+        (first)
+        (name))
+    (name x)))
+
+(map gimme-names (get-five-vals all-attrib-values-light-blue-cotton))
+
+; Step 4 Resolve list of strings to one string with spaces between the words.
+
+(clojure.string/join " " '("light" "blue" "mid-weight" "cotton" "woven"))
+
+; Step 5: Put it together
+
+; Take an EID and give me back the constructed name of the entity
+
+(defn build-a-name [eid]
+  (->> eid
+      all-attrib-values
+      get-five-vals
+      (map gimme-names)
+      (clojure.string/join " ")))
+
+(build-a-name 17592186045464)
+;; => "light blue mid-weight cotton woven"
 
 
 
@@ -606,3 +659,12 @@ all-eid-values-light-blue-cotton
 ;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
 
 ; solid eids  #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
+
+; ===========================
+
+; attributes to add:
+
+; price per yard
+
+; product name or SKU
+

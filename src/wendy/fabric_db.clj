@@ -11,12 +11,7 @@
 
 @(d/transact conn [{:db/doc "Hiya, world! This is my fabric database."}])
 
-(def fabric-schema [#_{:db/ident :fabric/name 
-                     :db/valueType :db.type/string
-                     :db/cardinality :db.cardinality/one
-                     :db/doc "The name of the fabric"}
-
-                    {:db/ident :fabric/fiber-origin
+(def fabric-schema [{:db/ident :fabric/fiber-origin
                      :db/valueType :db.type/ref
                      :db/cardinality :db.cardinality/many
                      :db/doc "The origin of the fabric's fibers"}
@@ -122,11 +117,8 @@
                      :db/valueType :db.type/string
                      :db/cardinality :db.cardinality/one
                      :db/doc "The vendor who sold the fabric"}])
-;; => #'wendy.fabric-db/fabric-schema
-
 
 @(d/transact conn fabric-schema)
-
 
 (def initial-fabrics [{#_#_:fabric/name "light blue green mid-weight linen"
                     :fabric/fiber-origin :fiber-origin/plant
@@ -211,7 +203,7 @@
                     :fabric/country "unknown"
                     :fabric/source "vintage"}
 
-                   {#_#_:fabric/name "white multicolor small floral cotton linen"
+                   {#_#_:fabric/name "white multicolor small-floral cotton linen"
                     :fabric/fiber-origin :fiber-origin/plant
                     :fabric/fiber-content [:fiber-content/linen :fiber-content/cotton]
                     :fabric/structure :structure/woven
@@ -274,20 +266,13 @@
 
 ;;;;;;;;;;;;;; BUILD A NAME FROM AN ENTITY ID.
 
-; Step 1 - get all the attribute values of one fabric's entity id
-
 (defn all-attrib-values [eid]
+"Takes an entity id, and returns a map of all the entity's attributes and attribute values."
   (d/touch (d/entity db eid)))
-
-(all-attrib-values 17592186045464)
-
-(def all-attrib-values-light-blue-cotton 
-  (all-attrib-values 17592186045464))
-
-; Step 2 - get the 5 attribute values of one fabric's entity map.
 
 (defn get-five-vals
   [map]
+"Takes an entity map, gets the attribute values of five attributes, and returns them in a list"
   (let [intensity (:fabric/color-intensity map)
         color (:fabric/color map)
         weight (:fabric/weight map)
@@ -295,33 +280,24 @@
         structure (:fabric/structure map)]
     (list intensity color weight content structure)))
 
-(get-five-vals all-attrib-values-light-blue-cotton)
-
-; Step 3+ Test for sets, get items out if set, return item otherwise, then return all with names resolved.
-
 (defn gimme-names [x]
+"Takes one item 'x' and checks for set? If 'x' is a set, return the item in the set, without the ns. If 'x' is not a set, return 'x', without the ns."
   (if (set? x)
     (-> x
         (first)
         (name))
     (name x)))
 
-(map gimme-names (get-five-vals all-attrib-values-light-blue-cotton))
-
 ; Step 4 Resolve list of strings to one string with spaces between the words.
 
 (clojure.string/join " " '("light" "blue" "mid-weight" "cotton" "woven"))
 
-; Put it together
-
-; Take an EID and give me back the constructed name of the entity
+; Step 5: Put it together
 
 (defn build-a-name [eid]
+ "Take an eid and give me the constructed name of the entity"
   (->> eid
       all-attrib-values
       get-five-vals
       (map gimme-names)
       (clojure.string/join " ")))
-
-(build-a-name 17592186045464)
-;; => "light blue mid-weight cotton woven"
