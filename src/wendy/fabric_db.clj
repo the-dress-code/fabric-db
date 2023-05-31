@@ -288,14 +288,8 @@
         (name))
     (name x)))
 
-; Step 4 Resolve list of strings to one string with spaces between the words.
-
-(clojure.string/join " " '("light" "blue" "mid-weight" "cotton" "woven"))
-
-; Step 5: Put it together
-
 (defn build-a-name [eid]
- "Take an eid and give me the constructed name of the entity"
+ "Take an eid and give me the constructed name of the entity."
   (->> eid
       all-attrib-values
       get-five-vals
