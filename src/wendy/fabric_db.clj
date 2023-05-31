@@ -317,12 +317,11 @@
 ; Take an EID and give me back the constructed name of the entity
 
 (defn build-a-name [eid]
-  (-> eid
+  (->> eid
       all-attrib-values
       get-five-vals
       (map gimme-names)
       (clojure.string/join " ")))
 
 (build-a-name 17592186045464)
-;; => Execution error (IllegalArgumentException) at java.lang.Object/toString (Object.java:246).
-;;    Don't know how to create ISeq from: wendy.fabric_db$gimme_names
+;; => "light blue mid-weight cotton woven"
