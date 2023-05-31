@@ -272,7 +272,6 @@
 
 (def db (d/db conn))
 
-
 ;;;;;;;;;;;;;; BUILD A NAME FROM AN ENTITY ID.
 
 ; Step 1 - get all the attribute values of one fabric's entity id
@@ -297,13 +296,6 @@
     (list intensity color weight content structure)))
 
 (get-five-vals all-attrib-values-light-blue-cotton)
-;; => (:color-intensity/light
-;;     #{:color/blue}
-;;     :weight/mid-weight
-;;     #{:fiber-content/cotton}
-;;     :structure/woven)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ; Step 3+ Test for sets, get items out if set, return item otherwise, then return all with names resolved.
 
@@ -322,3 +314,15 @@
 
 ; Put it together
 
+; Take an EID and give me back the constructed name of the entity
+
+(defn build-a-name [eid]
+  (-> eid
+      all-attrib-values
+      get-five-vals
+      (map gimme-names)
+      (clojure.string/join " ")))
+
+(build-a-name 17592186045464)
+;; => Execution error (IllegalArgumentException) at java.lang.Object/toString (Object.java:246).
+;;    Don't know how to create ISeq from: wendy.fabric_db$gimme_names
