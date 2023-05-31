@@ -530,15 +530,12 @@ all-eid-values-light-blue-cotton
 
 ; Step 4 Resolve list of strings to one string with spaces between the words.
 
-(str "light" "blue" "mid-weight" "cotton" "woven")
+; I want to add spaces, which are items, in between each existing item.
 
+(clojure.string/join " " '("light" "blue" "mid-weight" "cotton" "woven"))
+;; => "light blue mid-weight cotton woven"
 
-; HOW TO ADD WHITE SPACES?
-
-
-
-
-
+; YESSSSSSSSSSSSSSSSS BABYYYYYYYYYYYYYYYYY
 
 
 
@@ -564,18 +561,7 @@ all-eid-values-light-blue-cotton
 ;;     45
 ;;     "unknown")
 
-; how to resolve as string? this aint it.
 
-(require '[clojure.string :as string])
-
-(string/join "" '("i" "want" "candy"))
-;; => "iwantcandy"
-
-(clojure.string/join "" '("i" "want" "candy"))
-;; => "iwantcandy"
-
-
-(str  ("light" "blue" "mid-weight" "cotton" "woven"))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

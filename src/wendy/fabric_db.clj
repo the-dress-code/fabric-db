@@ -317,3 +317,8 @@
 (map gimme-names (get-five-vals all-attrib-values-light-blue-cotton))
 
 ; Step 4 Resolve list of strings to one string with spaces between the words.
+
+(clojure.string/join " " '("light" "blue" "mid-weight" "cotton" "woven"))
+
+; Put it together
+
