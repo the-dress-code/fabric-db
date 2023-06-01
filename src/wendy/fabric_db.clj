@@ -270,8 +270,7 @@
 "Takes an entity id, and returns a map of all the entity's attributes and attribute values."
   (d/touch (d/entity db eid)))
 
-(defn get-five-vals
-  [map]
+(defn get-five-vals [map]
 "Takes an entity map, gets the attribute values of five attributes, and returns them in a list"
   (let [intensity (:fabric/color-intensity map)
         color (:fabric/color map)
@@ -280,18 +279,20 @@
         structure (:fabric/structure map)]
     (list intensity color weight content structure)))
 
-(defn gimme-names [x]
-"Takes one item 'x' and checks for set? If 'x' is a set, return the item in the set, without the ns. If 'x' is not a set, return 'x', without the ns."
-  (if (set? x)
-    (-> x
-        (first)
-        (name))
-    (name x)))
+(defn giga-flatten [coll]
+"Takes one 'coll', checks for sets within, returns sets if they exists, puts single items in vectors if any. Returns a list."
+  (mapcat 
+   (fn [x] 
+     (if (set? x) 
+       x 
+       [x])) 
+   coll))
 
 (defn build-a-name [eid]
  "Take an eid and give me the constructed name of the entity."
   (->> eid
       all-attrib-values
       get-five-vals
-      (map gimme-names)
+      giga-flatten
+      (map name)
       (clojure.string/join " ")))
