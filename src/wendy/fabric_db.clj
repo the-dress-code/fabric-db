@@ -34,7 +34,7 @@
     (list intensity color weight content structure)))
 
 (defn giga-flatten [coll]
-"Takes one 'coll', checks for sets within, returns sets if they exists, puts single items in vectors if any. Returns a list."
+"Takes one 'coll', checks for sets within, returns sets if they exist, puts single items into vectors if any. Returns a list."
   (mapcat 
    (fn [x] 
      (if (set? x) 
@@ -50,5 +50,3 @@
       giga-flatten
       (map name)
       (clojure.string/join " ")))
-
-(build-a-name 17592186045464)
