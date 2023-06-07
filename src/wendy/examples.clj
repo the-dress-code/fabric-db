@@ -28,8 +28,5 @@
 
 (d/touch (d/entity db 17592186045464))
 
-(def poo 2)
-;; => #'wendy.examples/poo
-
 wendy.fabric-db/all-attrib-values-light-blue-cotton
 ;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
