@@ -8,7 +8,7 @@
 
                     {:db/ident :fiber-origin/plant}
                     {:db/ident :fiber-origin/animal}
-                    {:db/ident :fiber-origin/manufactured}  
+                    {:db/ident :fiber-origin/manufactured}
 
                     {:db/ident :fabric/fiber-content
                      :db/valueType :db.type/ref
@@ -16,7 +16,7 @@
                      :db/doc "The fiber content of the fabric"}
 
                     {:db/ident :fiber-content/linen}
-                    {:db/ident :fiber-content/cotton}  
+                    {:db/ident :fiber-content/cotton}
                     {:db/ident :fiber-content/polyester}
                     {:db/ident :fiber-content/rayon}
                     {:db/ident :fiber-content/wool}
@@ -31,7 +31,7 @@
                     {:db/ident :structure/non-woven}
                     {:db/ident :structure/felt}
                     {:db/ident :structure/skin}
-                   
+
                     {:db/ident :fabric/type
                      :db/valueType :db.type/ref
                      :db/cardinality :db.cardinality/many
@@ -42,16 +42,16 @@
                     {:db/ident :type/jersey}
                     {:db/ident :type/flannel}
                     {:db/ident :type/activewear}
-          
+
                     {:db/ident :fabric/pattern
                      :db/valueType :db.type/ref
                      :db/cardinality :db.cardinality/one
                      :db/doc "The pattern on the fabric"}
 
                     {:db/ident :pattern/solid}
-                    {:db/ident :pattern/stripe}      
-                    {:db/ident :pattern/geometric}      
-                    {:db/ident :pattern/small-floral}      
+                    {:db/ident :pattern/stripe}
+                    {:db/ident :pattern/geometric}
+                    {:db/ident :pattern/small-floral}
                     {:db/ident :pattern/med-floral}
 
                     {:db/ident :fabric/color
@@ -73,8 +73,8 @@
                      :db/doc "The intensity of the color of the fabric"}
 
                     {:db/ident :color-intensity/pale}
-                    {:db/ident :color-intensity/light}     
-                    {:db/ident :color-intensity/medium}     
+                    {:db/ident :color-intensity/light}
+                    {:db/ident :color-intensity/medium}
                     {:db/ident :color-intensity/dark}
 
                     {:db/ident :fabric/weight

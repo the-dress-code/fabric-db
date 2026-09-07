@@ -1,5 +1,6 @@
 (ns wendy.examples
-  (:gen-class))
+  (:gen-class)
+  (:require [datomic.api :as d]))
 
 (d/q '[:find ?e
        :where [?e :fabric/pattern :pattern/solid]]
@@ -13,7 +14,7 @@
 
 (def blue-plant-eids (d/q all-blue-plant-fabrics db))
 
-(def color-intensity-of-blue-plant-fabric 
+(def color-intensity-of-blue-plant-fabric
   "A query to return all blue & plant fabric entity ids and the color intensity eids"
   '[:find ?e ?color-intensity
     :where [?e :fabric/color :color/blue]

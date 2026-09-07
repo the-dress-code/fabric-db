@@ -1,9 +1,6 @@
 (ns wendy.experiment
-  (:gen-class))
-
-
-(require '[datomic.api :as d])
-
+  (:gen-class)
+  (:require [datomic.api :as d]))
 
 (def db-uri "datomic:mem://fabric")
 
@@ -17,7 +14,7 @@
 @(d/transact conn [{:db/doc "Hiya, world! This is my fabric database."}])
 
 
-(def fabric-schema [#_{:db/ident :fabric/name 
+(def fabric-schema [#_{:db/ident :fabric/name
                      :db/valueType :db.type/string
                      :db/cardinality :db.cardinality/one
                      :db/doc "The name of the fabric"}
@@ -29,7 +26,7 @@
 
                     {:db/ident :fiber-origin/plant}
                     {:db/ident :fiber-origin/animal}
-                    {:db/ident :fiber-origin/manufactured}  
+                    {:db/ident :fiber-origin/manufactured}
 
                     {:db/ident :fabric/fiber-content
                      :db/valueType :db.type/ref
@@ -37,7 +34,7 @@
                      :db/doc "The fiber content of the fabric"}
 
                     {:db/ident :fiber-content/linen}
-                    {:db/ident :fiber-content/cotton}  
+                    {:db/ident :fiber-content/cotton}
                     {:db/ident :fiber-content/polyester}
                     {:db/ident :fiber-content/rayon}
                     {:db/ident :fiber-content/wool}
@@ -52,7 +49,7 @@
                     {:db/ident :structure/non-woven}
                     {:db/ident :structure/felt}
                     {:db/ident :structure/skin}
-                   
+
                     {:db/ident :fabric/type
                      :db/valueType :db.type/ref
                      :db/cardinality :db.cardinality/many
@@ -64,7 +61,7 @@
                     {:db/ident :type/flannel}
                     {:db/ident :type/activewear}
 
-                    ;; possible additional types: challis, satin, denim, twill, chiffon, suiting, gabardine, 
+                    ;; possible additional types: challis, satin, denim, twill, chiffon, suiting, gabardine,
                     ;; swimwear, lace, lining, interlock, home-dec, sweater-knit
 
                     {:db/ident :fabric/pattern
@@ -73,9 +70,9 @@
                      :db/doc "The pattern on the fabric"}
 
                     {:db/ident :pattern/solid}
-                    {:db/ident :pattern/stripe}      
-                    {:db/ident :pattern/geometric}      
-                    {:db/ident :pattern/small-floral}      
+                    {:db/ident :pattern/stripe}
+                    {:db/ident :pattern/geometric}
+                    {:db/ident :pattern/small-floral}
                     {:db/ident :pattern/med-floral}
 
                     {:db/ident :fabric/color
@@ -97,8 +94,8 @@
                      :db/doc "The intensity of the color of the fabric"}
 
                     {:db/ident :color-intensity/pale}
-                    {:db/ident :color-intensity/light}     
-                    {:db/ident :color-intensity/medium}     
+                    {:db/ident :color-intensity/light}
+                    {:db/ident :color-intensity/medium}
                     {:db/ident :color-intensity/dark}
 
                     {:db/ident :fabric/weight
@@ -304,7 +301,7 @@
 
 ; Do something to the eid that is inside the vector, inside the set.
 
-(defn inc-set 
+(defn inc-set
   [coll]
   (inc (first coll)))
 
@@ -351,7 +348,7 @@
 (all-eid-values 17592186045464)
 ;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
 
-(def all-eid-values-light-blue-cotton 
+(def all-eid-values-light-blue-cotton
   (all-eid-values 17592186045464))
 ;; => #'wendy.fabric-db/all-eid-values-light-blue-cotton
 
@@ -407,7 +404,7 @@ all-eid-values-light-blue-cotton
 
 ; next step: modify your function to return 2 yr-vals
 
-;  when you want to do some work and store function calls into vars that you want to use later… 
+;  when you want to do some work and store function calls into vars that you want to use later…
 ;  use let below - bind the result of this to a var.
 
 (defn to-the-edge
@@ -421,7 +418,7 @@ all-eid-values-light-blue-cotton
 
 ;  next step: modify your function to return 2 yr-vals
 
-;  when you want to do some work and store function calls into vars that you want to use later… 
+;  when you want to do some work and store function calls into vars that you want to use later…
 ;  use let below - bind the result of this to a var.
 
 (defn to-the-edge
@@ -452,8 +449,8 @@ all-eid-values-light-blue-cotton
 
 ; what if i destructure like this....
 
-(defn get-some-vals 
-  [{a :fabric/weight 
+(defn get-some-vals
+  [{a :fabric/weight
     b :fabric/type}]
   (list a b))
 ;; => #'wendy.fabric-db/get-some-vals
@@ -495,7 +492,7 @@ all-eid-values-light-blue-cotton
 ;;     #{:fiber-content/cotton}
 ;;     :structure/woven)
 
-; Get value out of the set. Get name from the value. 
+; Get value out of the set. Get name from the value.
 
 (-> #{:color/blue}
     (first)
@@ -546,7 +543,7 @@ all-eid-values-light-blue-cotton
 
 (all-attrib-values 17592186045464)
 
-(def all-attrib-values-light-blue-cotton 
+(def all-attrib-values-light-blue-cotton
   (all-attrib-values 17592186045464))
 
 ; Step 2 - get the 5 attribute values of one fabric's entity map.
@@ -620,7 +617,7 @@ all-eid-values-light-blue-cotton
 
 
 
-(def color-intensity-of-blue-plants 
+(def color-intensity-of-blue-plants
   "A query to return all the blue and plant fabric entity ids and the ids for 1 attribute's entity id (color intensity)"
 
 

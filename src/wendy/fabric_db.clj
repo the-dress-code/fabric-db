@@ -2,7 +2,8 @@
   (:gen-class)
   (:require [datomic.api :as d]
             [wendy.schema :as s]
-            [wendy.data :as data]))
+            [wendy.data :as data]
+            [clojure.string :as str]))
 
 (def db-uri "datomic:mem://fabric")
 
@@ -20,12 +21,14 @@
 
 ;;;;;;;;;;;;;; BUILD A NAME FROM AN ENTITY ID.
 
-(defn all-attrib-values [eid]
-"Takes an entity id, and returns a map of all the entity's attributes and attribute values."
+(defn all-attrib-values
+  "Takes an entity id, and returns a map of all the entity's attributes and attribute values."
+  [eid]
   (d/touch (d/entity db eid)))
 
-(defn get-five-vals [map]
-"Takes an entity map, gets the attribute values of five attributes, and returns them in a list"
+(defn get-five-vals
+  "Takes an entity map, gets the attribute values of five attributes, and returns them in a list"
+  [map]
   (let [intensity (:fabric/color-intensity map)
         color (:fabric/color map)
         weight (:fabric/weight map)
@@ -33,20 +36,22 @@
         structure (:fabric/structure map)]
     (list intensity color weight content structure)))
 
-(defn giga-flatten [coll]
-"Takes one 'coll', checks for sets within, returns sets if they exist, puts single items into vectors if any. Returns a list."
-  (mapcat 
-   (fn [x] 
-     (if (set? x) 
-       x 
-       [x])) 
+(defn giga-flatten
+  "Takes one 'coll', checks for sets within, returns sets if they exist, puts single items into vectors if any. Returns a list."
+  [coll]
+  (mapcat
+   (fn [x]
+     (if (set? x)
+       x
+       [x]))
    coll))
 
-(defn build-a-name [eid]
- "Take an eid and give me the constructed name of the entity."
+(defn build-a-name
+   "Take an eid and give me the constructed name of the entity."
+  [eid]
   (->> eid
       all-attrib-values
       get-five-vals
       giga-flatten
       (map name)
-      (clojure.string/join " ")))
+      (str/join " ")))
