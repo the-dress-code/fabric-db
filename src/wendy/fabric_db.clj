@@ -98,14 +98,17 @@
 ;; this is 56 items, maybe you transacted the seed data 7 times. 8 of your 10 fabrics are solid → 7 × 8 = 56.
 ;; maybe (d/delete-database db-uri) to the file then create again
 
-
-(def all-blue-plant-fabrics
+(def all-blue-plant-fabrics-q
   "A query to return all the blue and plant fabric entity ids"
   '[:find ?e
     :where [?e :fabric/color :color/blue]
            [?e :fabric/fiber-origin :fiber-origin/plant]])
 
-(def blue-plant-eids (d/q all-blue-plant-fabrics db))
+(d/q all-blue-plant-fabrics-q db)
+;; => #{[17592186045459] [17592186045464]}
+
+
+(def blue-plant-eids (d/q all-blue-plant-fabrics-q db))
 
 (def color-intensity-of-blue-plant-fabric
   "A query to return all blue & plant fabric entity ids and the color intensity eids"
