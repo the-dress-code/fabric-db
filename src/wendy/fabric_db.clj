@@ -64,6 +64,7 @@
 ;; Experimental stuff from September 2026
 
 (all-attrib-values 17592186045464)
+;; => {:fabric/weight :weight/mid-weight, :fabric/type #{:type/dressweight}, :fabric/pattern :pattern/solid, :fabric/color #{:color/blue}, :fabric/length-yards 2.0, :fabric/color-intensity :color-intensity/light, :fabric/source "vintage", :fabric/fiber-origin #{:fiber-origin/plant}, :fabric/fiber-content #{:fiber-content/cotton}, :fabric/structure :structure/woven, :db/id 17592186045464, :fabric/width-inches 45, :fabric/country "unknown"}
 
 (def all-attrib-values-light-blue-cotton
   (all-attrib-values 17592186045464))
@@ -72,14 +73,24 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-;; Whats going on here, pulled from examples.clj
+; Pulled from examples.clj
 
+; Give me the eids for all the solid color fabrics I have right now.
+
+(def all-solids-q '[:find ?e 
+                    :where [?e :fabric/pattern :pattern/solid]])
+
+(d/q all-solids-q db)
+;; => #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
+
+;; same thing just without the named query, but same query.
 (d/q '[:find ?e
        :where [?e :fabric/pattern :pattern/solid]]
       (d/db conn))
 ;; => #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
 ;; result after loading buffer once after fresh repl start
 
+;; earlier unexpected result
 
 ;; => #{[17592186045537] [17592186045538] [17592186045543] [17592186045544] [17592186045545] [17592186045546] [17592186045548] [17592186045550] [17592186045551] [17592186045552] [17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468] [17592186045473] [17592186045474] [17592186045475] [17592186045476] [17592186045478] [17592186045480] [17592186045481] [17592186045482] [17592186045487] [17592186045488] [17592186045489] [17592186045490] [17592186045492] [17592186045494] [17592186045495] [17592186045496] [17592186045501] [17592186045502] [17592186045503] [17592186045504] [17592186045506] [17592186045508] [17592186045509] [17592186045510] [17592186045515] [17592186045516] [17592186045517] [17592186045518] [17592186045520] [17592186045522] [17592186045523] [17592186045524] [17592186045529] [17592186045530] [17592186045531] [17592186045532] [17592186045534] [17592186045536]}
 
