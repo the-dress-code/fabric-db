@@ -306,6 +306,8 @@
 (d/q '[:find ?e
        :where [?e :fabric/pattern :pattern/solid]]
       (d/db conn))
+;; => #{[17592186045459] [17592186045460] [17592186045461] [17592186045462] [17592186045464] [17592186045466] [17592186045467] [17592186045468]}
+;; these numbers are eids for the 8 fabrics that match that query, "solid" fabrics.
 
 ; Give me all the blue and plant fabrics.
 
@@ -314,6 +316,8 @@
                         [?e :fabric/fiber-origin :fiber-origin/plant]])
 
 (d/q all-blue-plant-fabrics db)
+;; => #{[17592186045459] [17592186045464]}
+;; returns the eids for the 2 fabrics that match that query
 
 ; Give me 1 attribute (color intensity) of all the entities that are blue and plant fabrics.
 
